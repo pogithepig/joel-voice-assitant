@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JOEL — Hands-Free AI Voice Assistant by Aditya</title>
+<meta name="description" content="Say “Hey JOEL” and talk hands-free to an AI voice assistant with a calm Texas drawl. Built by Aditya.">
+<meta property="og:title" content="JOEL — Hands-Free AI Voice Assistant by Aditya">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎙️%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#06080c;--card:#0d1219;--gold:#e0b04f;--gold2:#f6dc94;--silver:#c8d3df;--cyan:#5ec8f2;--red:#ff5a5a;--mut:#7d8896;--bd:#1e2733}
+*{box-sizing:border-box;margin:0}
+body{min-height:100vh;background:radial-gradient(ellipse at top,#101826,var(--bg) 60%) fixed;color:var(--silver);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+.disp{font-family:Orbitron,system-ui,sans-serif}
+main{max-width:1100px;margin:auto;padding:40px 20px;position:relative}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;padding-bottom:20px;border-bottom:1px solid var(--bd)}
+.eyebrow{font-size:10px;letter-spacing:.6em;text-transform:uppercase;color:rgba(224,176,79,.7)}
+.gold{background:linear-gradient(180deg,var(--gold2),var(--gold) 60%,#a77a22);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 14px rgba(224,176,79,.3))}
+h1{font-size:clamp(48px,10vw,76px);letter-spacing:.3em;margin-top:8px;font-weight:700}
+.sub{margin-top:4px;font-size:11px;letter-spacing:.35em;text-transform:uppercase;color:var(--mut)}
+.hud{position:relative;background:rgba(13,18,25,.8);border:1px solid var(--bd);border-radius:6px}
+.hud::before,.hud::after{content:"";position:absolute;width:10px;height:10px;border:1px solid var(--gold);opacity:.7}
+.hud::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.hud::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.owner{padding:12px 16px;text-align:right}
+.owner small{display:block;font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--mut)}
+.owner b{font-size:24px;letter-spacing:.25em;font-weight:500}
+.grid{display:grid;gap:32px;margin-top:32px;grid-template-columns:1.1fr 1fr}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;align-items:center}
+.orbwrap{position:relative;width:288px;height:288px;display:grid;place-items:center}
+.arc{position:absolute;border-radius:50%;border:2px solid transparent;animation:spin 8s linear infinite}
+.a1{inset:0;border-top-color:var(--gold);border-right-color:rgba(224,176,79,.25)}
+.a2{inset:24px;border-top-color:var(--silver);border-left-color:rgba(200,211,223,.2);animation-duration:12s;animation-direction:reverse}
+.a3{inset:-12px;border-top-color:var(--cyan);border-bottom-color:rgba(94,200,242,.2);animation-duration:16s}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(1.12);opacity:.6}}
+.orb{position:relative;width:176px;height:176px;border-radius:50%;border:1px solid rgba(224,176,79,.4);background:rgba(13,18,25,.9);box-shadow:0 0 40px rgba(224,176,79,.15),inset 0 0 30px rgba(224,176,79,.08);display:grid;place-items:center;cursor:pointer;color:var(--gold);transition:transform .3s}
+.orb:hover{transform:scale(1.05)}
+.orb:focus-visible,.btn:focus-visible,button:focus-visible{outline:2px solid var(--gold2);outline-offset:3px}
+.pulse{position:absolute;inset:0;border-radius:50%;background:rgba(224,176,79,.14);animation:pulse 2.4s ease-in-out infinite}
+.orb.rec .pulse{background:rgba(255,90,90,.22);animation-duration:1s}
+.orb.rec{color:var(--red);border-color:rgba(255,90,90,.5)}
+.orb svg{position:relative;width:44px;height:44px;filter:drop-shadow(0 0 14px currentColor)}
+.orb .sq{display:none}.orb.rec .sq{display:block}.orb.rec .mic{display:none}
+#status{margin-top:28px;font-size:14px;letter-spacing:.4em;color:var(--mut)}
+#status[data-t=live]{color:var(--silver)}#status[data-t=work]{color:var(--cyan)}#status[data-t=speak]{color:var(--gold)}
+#hint{margin-top:8px;max-width:300px;text-align:center;font-size:12px;color:var(--mut);min-height:32px}
+.btns{margin-top:24px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.btn{font:inherit;font-size:11px;letter-spacing:.15em;text-transform:uppercase;padding:9px 16px;color:var(--mut);cursor:pointer;transition:color .2s}
+.btn:hover{color:var(--silver)}.btn.on{color:var(--gold)}.btn.bad{color:var(--red)}.btn:disabled{opacity:.4;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.stat{padding:12px}
+.stat small{display:block;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--mut)}
+.stat b{display:block;margin-top:6px;font-size:14px;letter-spacing:.15em;font-weight:500}
+#log{height:384px;overflow-y:auto;padding:20px;margin-top:16px;font-size:14px;line-height:1.6;scroll-behavior:smooth}
+#log h2{font-size:9px;letter-spacing:.4em;text-transform:uppercase;color:var(--mut);margin-bottom:16px;font-weight:400}
+#log p{margin-bottom:12px}
+.assistant{color:var(--gold)}.user{color:var(--silver)}.system{color:var(--mut)}
+#log p span{font:11px ui-monospace,Menlo,Consolas,monospace;opacity:.6}
+footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--bd);text-align:center;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--mut)}
+footer b{font-size:16px;letter-spacing:.3em;font-weight:500}
+.gear{margin-left:auto}
+dialog{margin:auto;width:min(420px,92vw);padding:24px;border:1px solid var(--gold);border-radius:8px;background:var(--card);color:var(--silver)}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+dialog h3{font-weight:500;letter-spacing:.2em;margin-bottom:16px;color:var(--gold)}
+dialog label{display:block;font-size:12px;color:var(--mut);margin:14px 0 6px}
+dialog input,dialog select{width:100%;padding:9px 10px;background:#070a0f;color:var(--silver);border:1px solid var(--bd);border-radius:4px;font:inherit;font-size:14px}
+dialog p{font-size:12px;color:var(--mut);margin-top:12px;line-height:1.5}
+.row{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+@media(prefers-reduced-motion:reduce){.arc,.pulse{animation:none}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <p class="eyebrow">System online</p>
+      <h1 class="gold disp">JOEL</h1>
+      <p class="sub">AI voice assistant · Texas edition</p>
+    </div>
+    <div class="hud owner"><small>Owner</small><b class="gold disp">ADITYA</b></div>
+  </header>
+
+  <div class="grid">
+    <section class="col">
+      <div class="orbwrap">
+        <span class="arc a3"></span><span class="arc a1"></span><span class="arc a2"></span>
+        <button class="orb" id="orb" type="button" aria-label="Start talking to JOEL">
+          <span class="pulse"></span>
+          <svg class="mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+          <svg class="sq" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>
+        </button>
+      </div>
+      <p id="status" class="disp" data-t="idle">● STANDBY</p>
+      <p id="hint"></p>
+      <div class="btns">
+        <button class="btn hud" id="bWake" type="button">✦ “Hey JOEL” off</button>
+        <button class="btn hud" id="bFree" type="button">◉ Hands-free off</button>
+        <button class="btn hud" id="bMute" type="button">♪ Voice on</button>
+      </div>
+      <p id="warn" style="margin-top:16px;font-size:11px;color:var(--mut);text-align:center"></p>
+    </section>
+
+    <section>
+      <div class="stats">
+        <div class="hud stat"><small>Wake</small><b id="sWake">OFF</b></div>
+        <div class="hud stat"><small>Audio</small><b id="sAudio">LIVE</b></div>
+        <div class="hud stat"><small>Brain</small><b id="sBrain">FREE</b></div>
+      </div>
+      <div id="log" class="hud" aria-label="Conversation" aria-live="polite"><h2>Transcript</h2></div>
+      <div class="btns" style="justify-content:flex-start"><button class="btn hud" id="bSet" type="button">⚙ AI settings</button></div>
+    </section>
+  </div>
+
+  <footer>Designed &amp; built by <b class="gold disp">ADITYA PRATAP SINGH</b></footer>
+</main>
+
+<dialog id="dlg">
+  <h3 class="disp">AI SETTINGS</h3>
+  <label for="prov">Brain</label>
+  <select id="prov">
+    <option value="free">Free (no key, third-party service)</option>
+    <option value="anthropic">Claude (Anthropic API key)</option>
+    <option value="openai">OpenAI API key</option>
+  </select>
+  <label for="key">API key</label>
+  <input id="key" type="password" autocomplete="off" placeholder="Only needed for Claude / OpenAI">
+  <label for="model">Model (optional)</label>
+  <input id="model" placeholder="claude-sonnet-5-5 or gpt-4o-mini">
+  <p>Your key is saved only in this browser (localStorage) and sent only to the provider you pick. Never commit a key to GitHub.</p>
+  <div class="row"><button class="btn hud" id="dCancel" type="button">Cancel</button><button class="btn hud on" id="dSave" type="button">Save</button></div>
+</dialog>
+
+<script>
+const $ = id => document.getElementById(id);
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const GREET = "How may I assist you today, sir?";
+const WAKE_RE = /\b(?:hey|hi|okay|ok)[\s,.]+(?:joel|joe|jole|jewel|jol)\b/i;
+const SHUTDOWN_RE = /\b(shut\s*down|stand\s*by|standby|stand\s*down|stop)\b/i;
+const SYS = "You are JOEL, a hands-free voice assistant built by Aditya Pratap Singh. You speak with a calm, warm Texas drawl: relaxed, polite, a little folksy, and you address the user as \"sir\" now and then. Your replies are read aloud, so keep them short (1 to 3 sentences), in plain spoken English, with no markdown, lists, emojis or code blocks. If you do not know something, say so plainly.";
+
+let rec = null, busy = false, wakeOn = false, handsFree = false, muted = false, greeted = false, speakId = 0;
+const turns = [];
+let cfg = {provider: "free", key: "", model: ""};
+try { Object.assign(cfg, JSON.parse(localStorage.getItem("joel_cfg") || "{}")); } catch {}
+
+function log(role, text) {
+  const p = document.createElement("p");
+  p.className = role;
+  const tag = document.createElement("span");
+  tag.textContent = "[" + (role === "assistant" ? "JOEL" : role === "user" ? "YOU" : "SYS") + "] ";
+  p.append(tag, text);
+  $("log").appendChild(p);
+  $("log").scrollTop = $("log").scrollHeight;
+  if (role !== "system") turns.push({role, content: text});
+}
+function setState(text, tone) { $("status").textContent = "● " + text; $("status").dataset.t = tone; }
+function setRec(on) { $("orb").classList.toggle("rec", on); $("orb").setAttribute("aria-label", on ? "Stop listening" : "Start talking to JOEL"); }
+function sync() {
+  $("bWake").textContent = "✦ “Hey JOEL” " + (wakeOn ? "on" : "off");
+  $("bWake").classList.toggle("on", wakeOn);
+  $("bFree").textContent = "◉ Hands-free " + (handsFree ? "on" : "off");
+  $("bFree").classList.toggle("on", handsFree);
+  $("bMute").textContent = "♪ " + (muted ? "Voice off" : "Voice on");
+  $("bMute").classList.toggle("bad", muted);
+  $("sWake").textContent = wakeOn ? "ARMED" : "OFF";
+  $("sAudio").textContent = muted ? "MUTED" : "LIVE";
+  $("sBrain").textContent = {free: "FREE", anthropic: "CLAUDE", openai: "OPENAI"}[cfg.provider] || "FREE";
+  $("hint").textContent = rec && rec.mode === "query" ? "Speak now — JOEL stops when you go quiet."
+    : wakeOn ? "Just say “Hey JOEL” — no tapping needed." : "Tap the orb and ask anything.";
+}
+
+/* ---------- Speech output ---------- */
+function pickVoice() {
+  const v = speechSynthesis.getVoices();
+  return v.find(x => /^en/i.test(x.lang) && /david|alex|daniel|fred|mark|guy|james|male/i.test(x.name))
+      || v.find(x => /^en-US/i.test(x.lang)) || v.find(x => /^en/i.test(x.lang));
+}
+speechSynthesis.onvoiceschanged = () => {};
+function stopSpeaking() { speakId++; speechSynthesis.cancel(); }
+function speak(text) {
+  return new Promise(res => {
+    stopSpeaking();
+    const id = ++speakId;
+    const parts = (text.replace(/[*_`#]/g, "").match(/[^.!?\n]+[.!?]*/g) || [text]).map(s => s.trim()).filter(Boolean);
+    let i = 0;
+    const next = () => {
+      if (id !== speakId || i >= parts.length) return res();
+      const u = new SpeechSynthesisUtterance(parts[i++]);
+      const v = pickVoice();
+      if (v) u.voice = v;
+      u.lang = "en-US"; u.rate = 0.88; u.pitch = 0.75;  // slow and low for the drawl
+      u.onend = u.onerror = next;
+      speechSynthesis.speak(u);
+    };
+    next();
+  });
+}
+
+/* ---------- Speech input ---------- */
+function stopRec() {
+  const r = rec; rec = null;
+  if (r) { r.onend = r.onerror = r.onresult = null; try { r.abort(); } catch {} }
+  setRec(false);
+}
+function micBlocked() {
+  stopRec(); wakeOn = false; handsFree = false;
+  setState("MIC BLOCKED", "idle"); sync();
+  log("system", "Microphone access is needed. Allow it in your browser, then try again.");
+}
+function resume() {
+  setState("STANDBY", "idle");
+  if (handsFree) setTimeout(listenQuery, 400); else setTimeout(listenWake, 500);
+  sync();
+}
+
+function listenWake() {
+  if (!SR || !wakeOn || busy || rec) return;
+  const r = new SR();
+  r.lang = "en-US"; r.continuous = true; r.interimResults = true; r.mode = "wake";
+  rec = r;
+  r.onresult = e => {
+    let t = "";
+    for (const res of e.results) t += res[0].transcript + " ";
+    const m = t.match(WAKE_RE);
+    if (!m) return;
+    const final = e.results[e.results.length - 1].isFinal;
+    clearTimeout(r.timer);
+    const go = () => {
+      if (rec !== r) return;
+      const rest = t.slice(m.index + m[0].length).replace(/^[\s,.!?]+/, "").trim();
+      stopRec();
+      activate(rest.length > 3 ? rest : "");
+    };
+    if (final) go(); else r.timer = setTimeout(go, 1100);
+  };
+  r.onend = () => { if (rec === r) { rec = null; setTimeout(listenWake, 300); } };
+  r.onerror = e => { if (e.error === "not-allowed" || e.error === "service-not-allowed") micBlocked(); };
+  try { r.start(); } catch { rec = null; }
+  sync();
+}
+
+function listenQuery() {
+  if (!SR || rec || busy) return;
+  stopSpeaking();
+  const r = new SR();
+  r.lang = "en-US"; r.continuous = false; r.interimResults = true; r.mode = "query";
+  rec = r;
+  let heard = "";
+  setState("LISTENING", "live"); setRec(true); sync();
+  r.onresult = e => { heard = ""; for (const res of e.results) heard += res[0].transcript; };
+  r.onend = () => {
+    if (rec !== r) return;
+    rec = null; setRec(false);
+    const q = heard.trim();
+    if (q) handleQuery(q);
+    else { if (!handsFree) log("system", "No speech detected."); resume(); }
+  };
+  r.onerror = e => { if (e.error === "not-allowed" || e.error === "service-not-allowed") micBlocked(); };
+  try { r.start(); } catch { rec = null; setRec(false); resume(); }
+}
+
+async function activate(pre) {
+  stopRec(); stopSpeaking();
+  if (pre) { greeted = true; return handleQuery(pre); }
+  if (!greeted) {
+    greeted = true;
+    log("assistant", GREET);
+    if (!muted) { busy = true; setState("SPEAKING", "speak"); await speak(GREET); busy = false; }
+  }
+  listenQuery();
+}
+
+/* ---------- Brain ---------- */
+async function post(url, headers, body) {
+  const r = await fetch(url, {method: "POST", headers: {"content-type": "application/json", ...headers}, body: JSON.stringify(body)});
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error?.message || d.error || ("Request failed (" + r.status + ")."));
+  return d;
+}
+async function askJoel() {
+  const msgs = turns.slice(-20);
+  if (cfg.provider === "anthropic") {
+    if (!cfg.key) throw new Error("Add your Claude API key in AI settings.");
+    const d = await post("https://api.anthropic.com/v1/messages", {
+      "x-api-key": cfg.key, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true"
+    }, {model: cfg.model || "claude-sonnet-5-5", max_tokens: 400, system: SYS, messages: msgs});
+    return d.content.map(c => c.text || "").join("").trim();
+  }
+  const openai = cfg.provider === "openai";
+  if (openai && !cfg.key) throw new Error("Add your OpenAI API key in AI settings.");
+  const d = await post(openai ? "https://api.openai.com/v1/chat/completions" : "https://text.pollinations.ai/openai",
+    openai ? {authorization: "Bearer " + cfg.key} : {},
+    {model: openai ? (cfg.model || "gpt-4o-mini") : "openai", messages: [{role: "system", content: SYS}, ...msgs]});
+  return (d.choices?.[0]?.message?.content || "").trim();
+}
+
+async function handleQuery(q) {
+  busy = true;
+  if (SHUTDOWN_RE.test(q)) { handsFree = false; sync(); }
+  log("user", q);
+  setState("THINKING", "work");
+  let a = "";
+  try { a = await askJoel(); } catch (err) { log("system", err.message || "Something went wrong. Try again."); }
+  if (a) {
+    log("assistant", a);
+    if (!muted) { setState("SPEAKING", "speak"); await speak(a); }
+  }
+  busy = false;
+  resume();
+}
+
+/* ---------- Controls ---------- */
+$("orb").onclick = () => {
+  if (!SR) return log("system", "Speech recognition isn't supported in this browser. Open this page in Google Chrome.");
+  if (rec && rec.mode === "query") { rec.stop(); return; }
+  if (busy) { stopSpeaking(); return; }
+  activate("");
+};
+$("bWake").onclick = () => {
+  wakeOn = !wakeOn; sync();
+  if (wakeOn) listenWake(); else if (rec && rec.mode === "wake") stopRec();
+};
+$("bFree").onclick = () => { handsFree = !handsFree; sync(); if (handsFree && !rec && !busy) { stopRec(); activate(""); } };
+$("bMute").onclick = () => { muted = !muted; stopSpeaking(); sync(); };
+
+$("bSet").onclick = () => { $("prov").value = cfg.provider; $("key").value = cfg.key; $("model").value = cfg.model; $("dlg").showModal(); };
+$("dCancel").onclick = () => $("dlg").close();
+$("dSave").onclick = () => {
+  cfg = {provider: $("prov").value, key: $("key").value.trim(), model: $("model").value.trim()};
+  try { localStorage.setItem("joel_cfg", JSON.stringify(cfg)); } catch {}
+  $("dlg").close(); sync();
+  log("system", "AI settings saved.");
+};
+
+/* ---------- Boot ---------- */
+log("system", "JOEL is online.");
+if (SR) { wakeOn = true; sync(); listenWake(); }
+else { $("bWake").disabled = true; $("warn").textContent = "Voice wake-up isn't supported in this browser — open this page in Google Chrome."; sync(); }
+</script>
+</body>
+</html>
